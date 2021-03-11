@@ -53,7 +53,7 @@ def fit_model(
     train_X: csr_matrix, train_y: Series, random_state=13
 ) -> RandomForestClassifier:
     clf_tfidf = RandomForestClassifier(
-        class_weight="balanced", random_state=random_state
+        class_weight="balanced", random_state=random_state, max_depth=50
     )
     clf_tfidf.fit(train_X, train_y)
 
