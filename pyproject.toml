@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "dagshub-tutorial"
+version = "0.1.0"
+description = ""
+authors = ["Arslan <rslnkrmt2552@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+dagshub = "^0.1.6"
+dvc = "^2.0.5"
+joblib = "^1.0.1"
+pandas = "^1.2.3"
+scikit-learn = "^0.24.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
