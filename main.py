@@ -2,6 +2,7 @@ import argparse
 from pprint import pprint
 from typing import Dict, Final, Tuple
 
+import dagshub
 import joblib
 import pandas as pd
 from pandas import DataFrame, Series
@@ -96,28 +97,34 @@ def train():
     train_df = feature_engineering(train_df)
     test_df = feature_engineering(test_df)
 
-    print("Fitting Tf-Idf...")
-    train_tfidf, test_tfidf, tfidf = fit_tfidf(train_df, test_df)
+    with dagshub.dagshub_logger() as logger:
+        print("Fitting Tf-Idf...")
+        train_tfidf, test_tfidf, tfidf = fit_tfidf(train_df, test_df)
 
-    print("Saving Tf-Idf obj...")
-    joblib.dump(tfidf, "artifacts/tfidf.jlib")
+        print("Saving Tf-Idf obj...")
+        joblib.dump(tfidf, "artifacts/tfidf.jlib")
+        logger.log_hyperparams(tfidf.get_params())
 
-    print("Training model...")
-    train_y = train_df[CLASS_LBL]
-    model = fit_model(train_tfidf, train_y)
+        print("Training model...")
+        train_y = train_df[CLASS_LBL]
+        model = fit_model(train_tfidf, train_y)
 
-    print("Saving trained model...")
-    joblib.dump(model, "artifacts/model.jlib")
+        print("Saving trained model...")
+        joblib.dump(model, "artifacts/model.jlib")
+        logger.log_hyperparams(model_class=type(model).__name__)
+        logger.log_hyperparams({"model": model.get_params()})
 
-    print("Evaluating model...")
-    train_metrics = eval_model(model, train_tfidf, train_y)
-    print("Train metrics:")
-    pprint(train_metrics)
-    print("-" * 10)
+        print("Evaluating model...")
+        train_metrics = eval_model(model, train_tfidf, train_y)
+        print("Train metrics:")
+        pprint(train_metrics)
+        print("-" * 10)
+        logger.log_metrics({"f_train__{k}": v for k, v in train_metrics.items()})
 
-    test_metrics = eval_model(model, test_tfidf, test_df[CLASS_LBL])
-    print("Test metrics:")
-    pprint(test_metrics)
+        test_metrics = eval_model(model, test_tfidf, test_df[CLASS_LBL])
+        print("Test metrics:")
+        pprint(test_metrics)
+        logger.log_metrics({f"test__{k}": v for k, v in test_metrics.items()})
 
 
 if __name__ == "__main__":
