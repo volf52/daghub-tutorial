@@ -7,7 +7,7 @@ import pandas as pd
 from pandas import DataFrame, Series
 from scipy.sparse import csr_matrix
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
@@ -51,7 +51,7 @@ def fit_tfidf(
 def fit_model(
     train_X: csr_matrix, train_y: Series, random_state=13
 ) -> LogisticRegression:
-    log_clf_tfidf = LogisticRegression(solver="sag", random_state=random_state)
+    log_clf_tfidf = SGDClassifier(loss="modified_huber", random_state=random_state)
     log_clf_tfidf.fit(train_X, train_y)
 
     return log_clf_tfidf
