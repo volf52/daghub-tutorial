@@ -7,8 +7,8 @@ import joblib
 import pandas as pd
 from pandas import DataFrame, Series
 from scipy.sparse import csr_matrix
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
@@ -51,14 +51,18 @@ def fit_tfidf(
 
 def fit_model(
     train_X: csr_matrix, train_y: Series, random_state=13
-) -> LogisticRegression:
-    log_clf_tfidf = SGDClassifier(loss="modified_huber", random_state=random_state)
-    log_clf_tfidf.fit(train_X, train_y)
+) -> RandomForestClassifier:
+    clf_tfidf = RandomForestClassifier(
+        class_weight="balanced", random_state=random_state
+    )
+    clf_tfidf.fit(train_X, train_y)
 
-    return log_clf_tfidf
+    return clf_tfidf
 
 
-def eval_model(clf: LogisticRegression, X: csr_matrix, y: Series) -> Dict[str, float]:
+def eval_model(
+    clf: RandomForestClassifier, X: csr_matrix, y: Series
+) -> Dict[str, float]:
     y_proba = clf.predict_proba(X)[:, 1]
     y_pred = clf.predict(X)
 
